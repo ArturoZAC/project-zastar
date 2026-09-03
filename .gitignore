@@ -1,0 +1,37 @@
+# ===========================
+# Docs (planes, contexto, etc.)
+# ===========================
+docs/
+
+# ===========================
+# Node.js / Express (backend)
+# ===========================
+node_modules/
+dist/
+build/
+.env
+.env.*
+!.env.example
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ===========================
+# Vue + Vite (frontend)
+# ===========================
+*.local
+
+# ===========================
+# IDE / OS
+# ===========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
