@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "rootDir": "src/",
+    "outDir": "dist/",
 
-    "module": "nodenext",
-    "target": "esnext",
+    "module": "commonjs",
+    "target": "es2016",
     "types": ["node"],
 
     "sourceMap": true,
@@ -12,10 +12,12 @@
     "declarationMap": true,
 
     "strict": true,
-    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
