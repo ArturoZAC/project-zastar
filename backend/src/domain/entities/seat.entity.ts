@@ -1,4 +1,4 @@
-import { SeatTier } from '../enums';
+import { SeatTier } from "../enums";
 
 export interface Seat {
   id: string;

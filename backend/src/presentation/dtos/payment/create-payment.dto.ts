@@ -1,8 +1,6 @@
-import { createPaymentSchema, CreatePaymentInput } from '../../../shared/schemas/payment.schema';
+import { CreatePaymentInput, createPaymentSchema } from "../../../shared/schemas/payment.schema";
 
-type Result =
-  | { success: true; dto: CreatePaymentDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: CreatePaymentDto } | { success: false; error: string };
 
 export class CreatePaymentDto {
   private constructor(public readonly data: CreatePaymentInput) {}

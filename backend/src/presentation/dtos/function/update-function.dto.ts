@@ -1,8 +1,6 @@
-import { updateFunctionSchema, UpdateFunctionInput } from '../../../shared/schemas/function.schema';
+import { UpdateFunctionInput, updateFunctionSchema } from "../../../shared/schemas/function.schema";
 
-type Result =
-  | { success: true; dto: UpdateFunctionDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: UpdateFunctionDto } | { success: false; error: string };
 
 export class UpdateFunctionDto {
   private constructor(public readonly data: UpdateFunctionInput) {}

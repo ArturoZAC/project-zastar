@@ -1,8 +1,9 @@
-import { createReservationSchema, CreateReservationInput } from '../../../shared/schemas/reservation.schema';
+import {
+  CreateReservationInput,
+  createReservationSchema,
+} from "../../../shared/schemas/reservation.schema";
 
-type Result =
-  | { success: true; dto: CreateReservationDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: CreateReservationDto } | { success: false; error: string };
 
 export class CreateReservationDto {
   private constructor(public readonly data: CreateReservationInput) {}

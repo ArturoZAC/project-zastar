@@ -1,8 +1,6 @@
-import { updateMovieSchema, UpdateMovieInput } from '../../../shared/schemas/movie.schema';
+import { UpdateMovieInput, updateMovieSchema } from "../../../shared/schemas/movie.schema";
 
-type Result =
-  | { success: true; dto: UpdateMovieDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: UpdateMovieDto } | { success: false; error: string };
 
 export class UpdateMovieDto {
   private constructor(public readonly data: UpdateMovieInput) {}

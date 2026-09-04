@@ -1,5 +1,9 @@
-import { Movie } from '../entities/movie.entity';
-import { CreateMovieInput, MovieFilters, UpdateMovieInput } from '../../shared/schemas/movie.schema';
+import {
+  CreateMovieInput,
+  MovieFilters,
+  UpdateMovieInput,
+} from "../../shared/schemas/movie.schema";
+import { Movie } from "../entities/movie.entity";
 
 export abstract class MovieRepository {
   abstract findById(id: string): Promise<Movie | null>;

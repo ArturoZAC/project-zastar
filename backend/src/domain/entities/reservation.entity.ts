@@ -1,4 +1,4 @@
-import { ReservationStatus } from '../enums';
+import { ReservationStatus } from "../enums";
 
 export interface Reservation {
   id: string;

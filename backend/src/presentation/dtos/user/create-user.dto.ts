@@ -1,8 +1,6 @@
-import { createUserSchema, CreateUserInput } from '../../../shared/schemas/user.schema';
+import { CreateUserInput, createUserSchema } from "../../../shared/schemas/user.schema";
 
-type Result =
-  | { success: true; dto: CreateUserDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: CreateUserDto } | { success: false; error: string };
 
 export class CreateUserDto {
   private constructor(public readonly data: CreateUserInput) {}

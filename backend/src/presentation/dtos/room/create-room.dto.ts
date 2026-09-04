@@ -1,11 +1,6 @@
-import {
-  createRoomSchema,
-  CreateRoomInput,
-} from "../../../shared/schemas/room.schema";
+import { CreateRoomInput, createRoomSchema } from "../../../shared/schemas/room.schema";
 
-type Result =
-  | { success: true; dto: CreateRoomDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: CreateRoomDto } | { success: false; error: string };
 
 export class CreateRoomDto {
   private constructor(public readonly data: CreateRoomInput) {}

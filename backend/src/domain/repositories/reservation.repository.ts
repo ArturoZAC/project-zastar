@@ -1,5 +1,9 @@
-import { Reservation } from '../entities/reservation.entity';
-import { CreateReservationInput, ReservationFilters, UpdateReservationInput } from '../../shared/schemas/reservation.schema';
+import {
+  CreateReservationInput,
+  ReservationFilters,
+  UpdateReservationInput,
+} from "../../shared/schemas/reservation.schema";
+import { Reservation } from "../entities/reservation.entity";
 
 export abstract class ReservationRepository {
   abstract findById(id: string): Promise<Reservation | null>;

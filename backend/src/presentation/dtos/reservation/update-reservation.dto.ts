@@ -1,8 +1,9 @@
-import { updateReservationSchema, UpdateReservationInput } from '../../../shared/schemas/reservation.schema';
+import {
+  UpdateReservationInput,
+  updateReservationSchema,
+} from "../../../shared/schemas/reservation.schema";
 
-type Result =
-  | { success: true; dto: UpdateReservationDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: UpdateReservationDto } | { success: false; error: string };
 
 export class UpdateReservationDto {
   private constructor(public readonly data: UpdateReservationInput) {}

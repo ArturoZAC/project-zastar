@@ -1,5 +1,5 @@
-import { Genre } from '../entities/genre.entity';
-import { CreateGenreInput, UpdateGenreInput } from '../../shared/schemas/genre.schema';
+import { CreateGenreInput, UpdateGenreInput } from "../../shared/schemas/genre.schema";
+import { Genre } from "../entities/genre.entity";
 
 export abstract class GenreRepository {
   abstract findById(id: string): Promise<Genre | null>;

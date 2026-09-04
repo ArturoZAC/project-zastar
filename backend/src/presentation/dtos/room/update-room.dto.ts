@@ -1,11 +1,6 @@
-import {
-  updateRoomSchema,
-  UpdateRoomInput,
-} from "../../../shared/schemas/room.schema";
+import { UpdateRoomInput, updateRoomSchema } from "../../../shared/schemas/room.schema";
 
-type Result =
-  | { success: true; dto: UpdateRoomDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: UpdateRoomDto } | { success: false; error: string };
 
 export class UpdateRoomDto {
   private constructor(public readonly data: UpdateRoomInput) {}

@@ -1,4 +1,4 @@
-import { AgeRatingType } from '../enums';
+import { AgeRatingType } from "../enums";
 
 export interface Movie {
   id: string;

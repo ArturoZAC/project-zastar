@@ -1,8 +1,6 @@
-import { createMovieSchema, CreateMovieInput } from '../../../shared/schemas/movie.schema';
+import { CreateMovieInput, createMovieSchema } from "../../../shared/schemas/movie.schema";
 
-type Result =
-  | { success: true; dto: CreateMovieDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: CreateMovieDto } | { success: false; error: string };
 
 export class CreateMovieDto {
   private constructor(public readonly data: CreateMovieInput) {}

@@ -1,14 +1,12 @@
-import { z } from "zod";
 import dotenv from "dotenv";
+import { z } from "zod";
 
 dotenv.config();
 
 const envSchema = z.object({
   // Server
   PORT: z.coerce.number().default(3000),
-  NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 
   // Database
   DATABASE_URL: z.string().url(),

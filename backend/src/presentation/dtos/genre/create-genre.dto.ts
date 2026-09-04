@@ -1,8 +1,6 @@
-import { createGenreSchema, CreateGenreInput } from '../../../shared/schemas/genre.schema';
+import { CreateGenreInput, createGenreSchema } from "../../../shared/schemas/genre.schema";
 
-type Result =
-  | { success: true; dto: CreateGenreDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: CreateGenreDto } | { success: false; error: string };
 
 export class CreateGenreDto {
   private constructor(public readonly data: CreateGenreInput) {}

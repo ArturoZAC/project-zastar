@@ -1,5 +1,5 @@
-import { Room } from '../entities/room.entity';
-import { CreateRoomInput, RoomFilters, UpdateRoomInput } from '../../shared/schemas/room.schema';
+import { CreateRoomInput, RoomFilters, UpdateRoomInput } from "../../shared/schemas/room.schema";
+import { Room } from "../entities/room.entity";
 
 export abstract class RoomRepository {
   abstract findById(id: string): Promise<Room | null>;

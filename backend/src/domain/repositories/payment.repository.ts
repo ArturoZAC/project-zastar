@@ -1,5 +1,5 @@
-import { Payment } from '../entities/payment.entity';
-import { CreatePaymentInput, UpdatePaymentInput } from '../../shared/schemas/payment.schema';
+import { CreatePaymentInput, UpdatePaymentInput } from "../../shared/schemas/payment.schema";
+import { Payment } from "../entities/payment.entity";
 
 export abstract class PaymentRepository {
   abstract findById(id: string): Promise<Payment | null>;

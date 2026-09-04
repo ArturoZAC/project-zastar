@@ -1,11 +1,6 @@
-import {
-  createSeatSchema,
-  CreateSeatInput,
-} from "../../../shared/schemas/seat.schema";
+import { CreateSeatInput, createSeatSchema } from "../../../shared/schemas/seat.schema";
 
-type Result =
-  | { success: true; dto: CreateSeatDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: CreateSeatDto } | { success: false; error: string };
 
 export class CreateSeatDto {
   private constructor(public readonly data: CreateSeatInput) {}

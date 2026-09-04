@@ -1,4 +1,4 @@
-import { RoomFormat } from '../enums';
+import { RoomFormat } from "../enums";
 
 export interface Room {
   id: string;

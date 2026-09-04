@@ -5,10 +5,7 @@ export const createPaymentSchema = z.object({
   provider: z.literal("IZIPAY"),
   providerTransactionId: z.string().optional(),
   amount: z.number().positive(),
-  status: z
-    .enum(["PENDING", "SUCCESS", "FAILED"])
-    .optional()
-    .default("PENDING"),
+  status: z.enum(["PENDING", "SUCCESS", "FAILED"]).optional().default("PENDING"),
   rawResponse: z.string().optional(),
 });
 

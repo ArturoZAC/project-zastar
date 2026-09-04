@@ -1,5 +1,5 @@
-import { Seat } from '../entities/seat.entity';
-import { CreateSeatInput } from '../../shared/schemas/seat.schema';
+import { CreateSeatInput } from "../../shared/schemas/seat.schema";
+import { Seat } from "../entities/seat.entity";
 
 export abstract class SeatRepository {
   abstract findById(id: string): Promise<Seat | null>;

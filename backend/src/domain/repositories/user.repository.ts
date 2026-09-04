@@ -1,5 +1,5 @@
-import { User } from '../entities/user.entity';
-import { CreateUserInput, UpdateUserInput } from '../../shared/schemas/user.schema';
+import { CreateUserInput, UpdateUserInput } from "../../shared/schemas/user.schema";
+import { User } from "../entities/user.entity";
 
 export abstract class UserRepository {
   abstract findById(id: string): Promise<User | null>;

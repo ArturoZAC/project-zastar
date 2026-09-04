@@ -1,8 +1,6 @@
-import { createFunctionSchema, CreateFunctionInput } from '../../../shared/schemas/function.schema';
+import { CreateFunctionInput, createFunctionSchema } from "../../../shared/schemas/function.schema";
 
-type Result =
-  | { success: true; dto: CreateFunctionDto }
-  | { success: false; error: string };
+type Result = { success: true; dto: CreateFunctionDto } | { success: false; error: string };
 
 export class CreateFunctionDto {
   private constructor(public readonly data: CreateFunctionInput) {}
