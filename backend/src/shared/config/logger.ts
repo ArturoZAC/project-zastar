@@ -2,17 +2,24 @@ import pino from "pino";
 
 import { envs } from "./envs";
 
-const transport =
-  envs.NODE_ENV === "development"
-    ? { target: "pino-pretty", options: { colorize: true } }
-    : undefined;
+const isDev = envs.NODE_ENV === "development";
 
-export const logger = pino({
-  level: envs.NODE_ENV === "production" ? "info" : "debug",
-  transport,
-  serializers: {
-    err: pino.stdSerializers.err,
-    req: pino.stdSerializers.req,
-    res: pino.stdSerializers.res,
+const streams = isDev
+  ? [{ level: "debug", stream: pino.destination(1) }] // Consola
+  : [
+      { level: "error", stream: pino.destination({ dest: "./logs/error.log", mkdir: true }) },
+      { level: "warn", stream: pino.destination({ dest: "./logs/warn.log", mkdir: true }) },
+      { level: "info", stream: pino.destination({ dest: "./logs/app.log", mkdir: true }) },
+    ];
+
+export const logger = pino(
+  {
+    level: isDev ? "debug" : "info",
+    serializers: {
+      err: pino.stdSerializers.err,
+      req: pino.stdSerializers.req,
+      res: pino.stdSerializers.res,
+    },
   },
-});
+  pino.multistream(streams),
+);

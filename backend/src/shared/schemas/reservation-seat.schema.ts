@@ -6,15 +6,7 @@ export const createReservationSeatSchema = z.object({
   price: z.number().positive(),
 });
 
-export const createManyReservationSeatsSchema = z
-  .array(
-    z.object({
-      reservationId: z.string().uuid(),
-      seatId: z.string().uuid(),
-      price: z.number().positive(),
-    }),
-  )
-  .min(1);
+export const createManyReservationSeatsSchema = z.array(createReservationSeatSchema).min(1);
 
 export type CreateReservationSeatInput = z.infer<typeof createReservationSeatSchema>;
 export type CreateManyReservationSeatsInput = z.infer<typeof createManyReservationSeatsSchema>;

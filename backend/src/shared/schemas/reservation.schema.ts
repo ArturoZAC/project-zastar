@@ -1,28 +1,20 @@
 import { z } from "zod";
 
-export const createReservationSchema = z
-  .object({
-    ticketCode: z.string().min(1).max(12),
-    userId: z.string().uuid().optional(),
-    guestFullName: z.string().min(1).max(150).optional(),
-    guestEmail: z.string().email().max(255).optional(),
-    guestPhone: z.string().min(1).max(20).optional(),
-    functionId: z.string().uuid(),
-    totalAmount: z.number().positive(),
-    expiresAt: z.string().datetime(),
-  })
-  .refine((data) => data.userId || data.guestEmail, {
-    message: "Either userId or guestEmail must be provided",
-  });
+export const createReservationSchema = z.object({
+  functionId: z.string().uuid(),
+  guestEmail: z.string().email().max(255),
+  guestName: z.string().min(1).max(255),
+  guestPhone: z.string().min(1).max(20).optional(),
+  seatIds: z.array(z.string().uuid()).min(1).max(10),
+});
 
 export const updateReservationSchema = z.object({
-  status: z.enum(["PENDING", "CONFIRMED", "CANCELLED", "EXPIRED"]).optional(),
-  confirmedAt: z.string().datetime().optional(),
+  status: z.enum(["pending", "confirmed", "cancelled", "expired"]).optional(),
+  expiresAt: z.string().datetime().optional(),
 });
 
 export const reservationFiltersSchema = z.object({
-  status: z.enum(["PENDING", "CONFIRMED", "CANCELLED", "EXPIRED"]).optional(),
-  userId: z.string().uuid().optional(),
+  status: z.enum(["pending", "confirmed", "cancelled", "expired"]).optional(),
   guestEmail: z.string().email().optional(),
   functionId: z.string().uuid().optional(),
 });

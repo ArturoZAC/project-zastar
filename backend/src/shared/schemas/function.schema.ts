@@ -3,16 +3,16 @@ import { z } from "zod";
 export const createFunctionSchema = z.object({
   movieId: z.string().uuid(),
   roomId: z.string().uuid(),
-  format: z.enum(["2D", "3D"]),
-  language: z.enum(["SUBTITULADA", "DOBLADA"]),
+  format: z.enum(["2D", "3D", "IMAX", "4DX"]),
+  language: z.enum(["subtitled", "dubbed", "original"]),
   startTime: z.string().datetime(),
   basePrice: z.number().positive(),
   vipSurcharge: z.number().positive().optional().default(0),
 });
 
 export const updateFunctionSchema = z.object({
-  format: z.enum(["2D", "3D"]).optional(),
-  language: z.enum(["SUBTITULADA", "DOBLADA"]).optional(),
+  format: z.enum(["2D", "3D", "IMAX", "4DX"]).optional(),
+  language: z.enum(["subtitled", "dubbed", "original"]).optional(),
   startTime: z.string().datetime().optional(),
   basePrice: z.number().positive().optional(),
   vipSurcharge: z.number().positive().optional(),

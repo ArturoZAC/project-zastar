@@ -12,7 +12,6 @@ import { reservations, reservationStatusEnum } from "./schema/reservation.schema
 import { reservationSeats } from "./schema/reservation-seat.schema";
 import { roomFormatEnum, rooms } from "./schema/room.schema";
 import { seats, seatTierEnum } from "./schema/seat.schema";
-// Schema imports — each file directly (no barrel)
 import { userRoleEnum, users } from "./schema/user.schema";
 
 const schema = {

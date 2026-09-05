@@ -6,9 +6,8 @@ export const createMovieSchema = z.object({
   durationMinutes: z.number().int().positive(),
   posterUrl: z.string().url().max(500).optional(),
   trailerUrl: z.string().url().max(500).optional(),
-  ageRating: z.enum(["APT", "14+", "18+"]),
-  releaseDate: z.string().datetime().optional(),
-  genreIds: z.array(z.string().uuid()).min(1),
+  ageRating: z.enum(["G", "PG", "PG13", "R", "NC17"]),
+  language: z.enum(["subtitled", "dubbed", "original"]).optional().default("original"),
 });
 
 export const updateMovieSchema = z.object({
@@ -17,10 +16,9 @@ export const updateMovieSchema = z.object({
   durationMinutes: z.number().int().positive().optional(),
   posterUrl: z.string().url().max(500).optional(),
   trailerUrl: z.string().url().max(500).optional(),
-  ageRating: z.enum(["APT", "14+", "18+"]).optional(),
-  releaseDate: z.string().datetime().optional(),
+  ageRating: z.enum(["G", "PG", "PG13", "R", "NC17"]).optional(),
+  language: z.enum(["subtitled", "dubbed", "original"]).optional(),
   isActive: z.boolean().optional(),
-  genreIds: z.array(z.string().uuid()).optional(),
 });
 
 export const movieFiltersSchema = z.object({
@@ -29,7 +27,8 @@ export const movieFiltersSchema = z.object({
     .transform((val) => val === "true")
     .optional(),
   title: z.string().optional(),
-  ageRating: z.enum(["APT", "14+", "18+"]).optional(),
+  ageRating: z.enum(["G", "PG", "PG13", "R", "NC17"]).optional(),
+  language: z.enum(["subtitled", "dubbed", "original"]).optional(),
 });
 
 export type CreateMovieInput = z.infer<typeof createMovieSchema>;

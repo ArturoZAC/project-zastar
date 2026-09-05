@@ -1,35 +1,20 @@
-import { Response } from "express";
-
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
-  data: T;
+  data?: T;
+  errors?: Record<string, string[]>;
 }
 
 export class ResponseHelper {
-  static success<T>(res: Response, message: string, data: T, statusCode = 200): void {
-    const response: ApiResponse<T> = {
-      success: true,
-      message,
-      data,
-    };
-    res.status(statusCode).json(response);
+  static success<T>(message: string, data: T): ApiResponse<T> {
+    return { success: true, message, data };
   }
 
-  static created<T>(res: Response, message: string, data: T): void {
-    ResponseHelper.success(res, message, data, 201);
+  static created<T>(message: string, data: T): ApiResponse<T> {
+    return { success: true, message, data };
   }
 
-  static noContent(res: Response): void {
-    res.status(204).send();
-  }
-
-  static error(res: Response, message: string, statusCode = 500): void {
-    const response: ApiResponse<null> = {
-      success: false,
-      message,
-      data: null,
-    };
-    res.status(statusCode).json(response);
+  static error(message: string, errors?: Record<string, string[]>): ApiResponse<null> {
+    return { success: false, message, errors };
   }
 }

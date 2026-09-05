@@ -3,8 +3,8 @@ import { z } from "zod";
 export const createSeatSchema = z.object({
   roomId: z.string().uuid(),
   row: z.string().min(1).max(5),
-  column: z.number().int().positive(),
-  tier: z.enum(["STANDARD", "VIP"]).optional().default("STANDARD"),
+  number: z.number().int().positive(),
+  tier: z.enum(["standard", "vip", "premium"]).optional().default("standard"),
 });
 
 export const createManySeatsSchema = z.object({
@@ -13,8 +13,8 @@ export const createManySeatsSchema = z.object({
     .array(
       z.object({
         row: z.string().min(1).max(5),
-        column: z.number().int().positive(),
-        tier: z.enum(["STANDARD", "VIP"]).optional().default("STANDARD"),
+        number: z.number().int().positive(),
+        tier: z.enum(["standard", "vip", "premium"]).optional().default("standard"),
       }),
     )
     .min(1),

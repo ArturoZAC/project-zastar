@@ -1,6 +1,7 @@
+//prettier-ignore
 export interface ReservationSeat {
-  id: string;
-  reservationId: string;
-  seatId: string;
-  price: number;
+  reservationId : string;
+  seatId        : string;
+  price         : number;
+  createdAt     : Date;
 }

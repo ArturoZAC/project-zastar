@@ -1,16 +1,16 @@
 import { ReservationStatus } from "../enums";
 
+//prettier-ignore
 export interface Reservation {
-  id: string;
-  ticketCode: string;
-  userId?: string;
-  guestFullName?: string;
-  guestEmail?: string;
-  guestPhone?: string;
-  functionId: string;
-  status: ReservationStatus;
-  totalAmount: number;
-  expiresAt: Date;
-  createdAt: Date;
-  confirmedAt?: Date;
+  id            : string;
+  functionId    : string;
+  guestEmail?   : string;
+  guestName?    : string;
+  guestPhone?   : string;
+  ticketCode    : string;
+  totalPrice    : number;
+  status        : ReservationStatus;
+  createdAt     : Date;
+  updatedAt     : Date;
+  expiresAt?    : Date;
 }

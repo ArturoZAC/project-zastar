@@ -12,5 +12,6 @@ export interface Function {
   vipSurcharge: number;
   isActive    : boolean;
   createdAt   : Date;
-  deletedAt?  :  Date;
+  updatedAt   : Date;
+  deletedAt?  : Date;
 }

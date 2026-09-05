@@ -23,6 +23,13 @@ const envSchema = z.object({
   IZIPAY_MERCHANT_CODE: z.string().min(1),
   IZIPAY_API_KEY: z.string().min(1),
   IZIPAY_PUBLIC_KEY: z.string().min(1),
+
+  // Culqi
+  CULQI_PUBLIC_KEY: z.string().min(1),
+  CULQI_SECRET_KEY: z.string().min(1),
+
+  // Payment provider selection
+  ACTIVE_PAYMENT_PROVIDER: z.enum(["culqi", "izipay"]).default("culqi"),
 });
 
 const parsed = envSchema.safeParse(process.env);

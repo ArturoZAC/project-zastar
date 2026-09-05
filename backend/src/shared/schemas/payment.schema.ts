@@ -2,17 +2,15 @@ import { z } from "zod";
 
 export const createPaymentSchema = z.object({
   reservationId: z.string().uuid(),
-  provider: z.literal("IZIPAY"),
-  providerTransactionId: z.string().optional(),
+  provider: z.enum(["culqi", "izipay"]),
+  providerPaymentId: z.string().optional(),
   amount: z.number().positive(),
-  status: z.enum(["PENDING", "SUCCESS", "FAILED"]).optional().default("PENDING"),
-  rawResponse: z.string().optional(),
+  status: z.enum(["pending", "completed", "failed", "refunded"]).optional().default("pending"),
 });
 
 export const updatePaymentSchema = z.object({
-  providerTransactionId: z.string().optional(),
-  status: z.enum(["PENDING", "SUCCESS", "FAILED"]).optional(),
-  rawResponse: z.string().optional(),
+  providerPaymentId: z.string().optional(),
+  status: z.enum(["pending", "completed", "failed", "refunded"]).optional(),
 });
 
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;

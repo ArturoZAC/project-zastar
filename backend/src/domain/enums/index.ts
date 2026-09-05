@@ -1,42 +1,51 @@
 export enum UserRole {
-  CUSTOMER = "CUSTOMER",
-  ADMIN = "ADMIN",
+  ADMIN = "admin",
+  CASHIER = "cashier",
+  USER = "user",
 }
 
 export enum RoomFormat {
   TWO_D = "2D",
   THREE_D = "3D",
+  IMAX = "IMAX",
+  FOUR_DX = "4DX",
 }
 
 export enum SeatTier {
-  STANDARD = "STANDARD",
-  VIP = "VIP",
+  STANDARD = "standard",
+  VIP = "vip",
+  PREMIUM = "premium",
 }
 
 export enum AgeRatingType {
-  APT = "APT",
-  FOURTEEN_PLUS = "14+",
-  EIGHTEEN_PLUS = "18+",
+  G = "G",
+  PG = "PG",
+  PG13 = "PG13",
+  R = "R",
+  NC17 = "NC17",
 }
 
 export enum LanguageType {
-  SUBTITULADA = "SUBTITULADA",
-  DOBLADA = "DOBLADA",
+  SUBTITLED = "subtitled",
+  DUBBED = "dubbed",
+  ORIGINAL = "original",
 }
 
 export enum ReservationStatus {
-  PENDING = "PENDING",
-  CONFIRMED = "CONFIRMED",
-  CANCELLED = "CANCELLED",
-  EXPIRED = "EXPIRED",
+  PENDING = "pending",
+  CONFIRMED = "confirmed",
+  CANCELLED = "cancelled",
+  EXPIRED = "expired",
 }
 
 export enum PaymentProvider {
-  IZIPAY = "IZIPAY",
+  CULQI = "culqi",
+  IZIPAY = "izipay",
 }
 
 export enum PaymentStatus {
-  PENDING = "PENDING",
-  SUCCESS = "SUCCESS",
-  FAILED = "FAILED",
+  PENDING = "pending",
+  COMPLETED = "completed",
+  FAILED = "failed",
+  REFUNDED = "refunded",
 }
