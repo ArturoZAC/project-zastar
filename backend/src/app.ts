@@ -5,12 +5,13 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "./shared/config/auth";
 import { envs } from "./shared/config/envs";
 import { errorHandler } from "./presentation/middlewares/error-handler.middleware";
+import { apiLimiter, authLimiter } from "./presentation/middlewares/rate-limit.middleware";
 import routes from "./presentation/routes";
 
 const app: ReturnType<typeof express> = express();
 
 // Better Auth handler (MUST be before express.json())
-app.all("/api/auth/{*any}", toNodeHandler(auth));
+app.all("/api/auth/{*any}", authLimiter, toNodeHandler(auth));
 
 // Body parsing (AFTER Better Auth handler)
 app.use(express.json());
@@ -24,6 +25,9 @@ app.use(
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   }),
 );
+
+// Rate limiting for all API routes
+app.use("/api/v1", apiLimiter);
 
 // Health check
 app.get("/health", (_req, res) => {

@@ -6,6 +6,7 @@ import { ReservationRepositoryImpl } from "../../infrastructure/repositories/res
 import { ReservationSeatRepositoryImpl } from "../../infrastructure/repositories/reservation-seat.repository";
 import { SeatRepositoryImpl } from "../../infrastructure/repositories/seat.repository";
 import { ReservationController } from "../controllers/reservation.controller";
+import { paymentLimiter } from "../middlewares/rate-limit.middleware";
 
 export class ReservationRoutes {
   readonly router: Router;
@@ -29,7 +30,7 @@ export class ReservationRoutes {
     this.router.get("/", controller.getAll);
     this.router.get("/ticket/:ticketCode", controller.getByTicketCode);
     this.router.get("/:id", controller.getById);
-    this.router.post("/:id/pay", controller.confirmPayment);
+    this.router.post("/:id/pay", paymentLimiter, controller.confirmPayment);
     this.router.post("/:id/cancel", controller.cancel);
   }
 }
