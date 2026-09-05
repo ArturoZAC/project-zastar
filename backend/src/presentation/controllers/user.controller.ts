@@ -1,41 +1,62 @@
 import { Request, Response } from "express";
 
-import { CreateUserUseCase } from "../../application/use-cases/user/create-user.use-case";
-import { DeleteUserUseCase } from "../../application/use-cases/user/delete-user.use-case";
-import { GetUserUseCase } from "../../application/use-cases/user/get-user.use-case";
-import { UpdateUserUseCase } from "../../application/use-cases/user/update-user.use-case";
-import { UserRepositoryImpl } from "../../infrastructure/repositories/user.repository";
+import { CreateUser } from "../../application/use-cases/user/create-user.use-case";
+import { DeleteUser } from "../../application/use-cases/user/delete-user.use-case";
+import { GetAllUsers } from "../../application/use-cases/user/get-all-users.use-case";
+import { GetUser } from "../../application/use-cases/user/get-user.use-case";
+import { UpdateUser } from "../../application/use-cases/user/update-user.use-case";
+import { UserRepository } from "../../domain/repositories/user.repository";
+import { handleError } from "../../shared/helpers/handle-error";
 import { ResponseHelper } from "../../shared/helpers/response";
-
-const userRepo = new UserRepositoryImpl();
+import { CreateUserDto } from "../dtos/user/create-user.dto";
+import { UpdateUserDto } from "../dtos/user/update-user.dto";
 
 export class UserController {
-  static async create(req: Request, res: Response) {
-    const useCase = new CreateUserUseCase(userRepo);
-    const user = await useCase.execute(req.body);
-    res.status(201).json(ResponseHelper.created("User created", user));
-  }
+  constructor(private readonly userRepo: UserRepository) {}
 
-  static async getAll(_req: Request, res: Response) {
-    const users = await userRepo.findAll();
-    res.status(200).json(ResponseHelper.success("Users retrieved", users));
-  }
+  public create = (req: Request, res: Response) => {
+    const { error, dto } = CreateUserDto.create(req.body);
+    if (error) return res.status(400).json({ success: false, message: error });
 
-  static async getById(req: Request, res: Response) {
-    const useCase = new GetUserUseCase(userRepo);
-    const user = await useCase.execute(req.params.id as string);
-    res.status(200).json(ResponseHelper.success("User retrieved", user));
-  }
+    new CreateUser(this.userRepo)
+      .execute(dto!.data)
+      .then((user) => res.status(201).json(ResponseHelper.created("User created", user)))
+      .catch((err) => handleError(err, res));
+  };
 
-  static async update(req: Request, res: Response) {
-    const useCase = new UpdateUserUseCase(userRepo);
-    const user = await useCase.execute(req.params.id as string, req.body);
-    res.status(200).json(ResponseHelper.success("User updated", user));
-  }
+  public getAll = (req: Request, res: Response) => {
+    new GetAllUsers(this.userRepo)
+      .execute()
+      .then((users) => res.status(200).json(ResponseHelper.success("Users retrieved", users)))
+      .catch((err) => handleError(err, res));
+  };
 
-  static async delete(req: Request, res: Response) {
-    const useCase = new DeleteUserUseCase(userRepo);
-    await useCase.execute(req.params.id as string);
-    res.status(204).send();
-  }
+  public getById = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+
+    new GetUser(this.userRepo)
+      .execute(id)
+      .then((user) => res.status(200).json(ResponseHelper.success("User retrieved", user)))
+      .catch((err) => handleError(err, res));
+  };
+
+  public update = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    const { error, dto } = UpdateUserDto.create(req.body);
+    if (error) return res.status(400).json({ success: false, message: error });
+
+    new UpdateUser(this.userRepo)
+      .execute(id, dto!.data)
+      .then((user) => res.status(200).json(ResponseHelper.success("User updated", user)))
+      .catch((err) => handleError(err, res));
+  };
+
+  public delete = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+
+    new DeleteUser(this.userRepo)
+      .execute(id)
+      .then(() => res.status(204).send())
+      .catch((err) => handleError(err, res));
+  };
 }

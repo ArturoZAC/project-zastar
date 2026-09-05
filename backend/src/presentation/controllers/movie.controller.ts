@@ -1,45 +1,61 @@
 import { Request, Response } from "express";
 
-import { CreateMovieUseCase } from "../../application/use-cases/movie/create-movie.use-case";
-import { DeleteMovieUseCase } from "../../application/use-cases/movie/delete-movie.use-case";
-import {
-  GetAllMoviesUseCase,
-  GetMovieByIdUseCase,
-} from "../../application/use-cases/movie/get-movies.use-case";
-import { UpdateMovieUseCase } from "../../application/use-cases/movie/update-movie.use-case";
-import { MovieRepositoryImpl } from "../../infrastructure/repositories/movie.repository";
+import { CreateMovie } from "../../application/use-cases/movie/create-movie.use-case";
+import { DeleteMovie } from "../../application/use-cases/movie/delete-movie.use-case";
+import { GetAllMovies, GetMovieById } from "../../application/use-cases/movie/get-movies.use-case";
+import { UpdateMovie } from "../../application/use-cases/movie/update-movie.use-case";
+import { MovieRepository } from "../../domain/repositories/movie.repository";
+import { handleError } from "../../shared/helpers/handle-error";
 import { ResponseHelper } from "../../shared/helpers/response";
-
-const movieRepo = new MovieRepositoryImpl();
+import { CreateMovieDto } from "../dtos/movie/create-movie.dto";
+import { UpdateMovieDto } from "../dtos/movie/update-movie.dto";
 
 export class MovieController {
-  static async create(req: Request, res: Response) {
-    const useCase = new CreateMovieUseCase(movieRepo);
-    const movie = await useCase.execute(req.body);
-    res.status(201).json(ResponseHelper.created("Movie created", movie));
-  }
+  constructor(private readonly movieRepo: MovieRepository) {}
 
-  static async getAll(req: Request, res: Response) {
-    const useCase = new GetAllMoviesUseCase(movieRepo);
-    const movies = await useCase.execute(req.query);
-    res.status(200).json(ResponseHelper.success("Movies retrieved", movies));
-  }
+  public create = (req: Request, res: Response) => {
+    const { error, dto } = CreateMovieDto.create(req.body);
+    if (error) return res.status(400).json({ success: false, message: error });
 
-  static async getById(req: Request, res: Response) {
-    const useCase = new GetMovieByIdUseCase(movieRepo);
-    const movie = await useCase.execute(req.params.id as string);
-    res.status(200).json(ResponseHelper.success("Movie retrieved", movie));
-  }
+    new CreateMovie(this.movieRepo)
+      .execute(dto!.data)
+      .then((movie) => res.status(201).json(ResponseHelper.created("Movie created", movie)))
+      .catch((err) => handleError(err, res));
+  };
 
-  static async update(req: Request, res: Response) {
-    const useCase = new UpdateMovieUseCase(movieRepo);
-    const movie = await useCase.execute(req.params.id as string, req.body);
-    res.status(200).json(ResponseHelper.success("Movie updated", movie));
-  }
+  public getAll = (req: Request, res: Response) => {
+    new GetAllMovies(this.movieRepo)
+      .execute(req.query as Record<string, string>)
+      .then((movies) => res.status(200).json(ResponseHelper.success("Movies retrieved", movies)))
+      .catch((err) => handleError(err, res));
+  };
 
-  static async delete(req: Request, res: Response) {
-    const useCase = new DeleteMovieUseCase(movieRepo);
-    await useCase.execute(req.params.id as string);
-    res.status(204).send();
-  }
+  public getById = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+
+    new GetMovieById(this.movieRepo)
+      .execute(id)
+      .then((movie) => res.status(200).json(ResponseHelper.success("Movie retrieved", movie)))
+      .catch((err) => handleError(err, res));
+  };
+
+  public update = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    const { error, dto } = UpdateMovieDto.create(req.body);
+    if (error) return res.status(400).json({ success: false, message: error });
+
+    new UpdateMovie(this.movieRepo)
+      .execute(id, dto!.data)
+      .then((movie) => res.status(200).json(ResponseHelper.success("Movie updated", movie)))
+      .catch((err) => handleError(err, res));
+  };
+
+  public delete = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+
+    new DeleteMovie(this.movieRepo)
+      .execute(id)
+      .then(() => res.status(204).send())
+      .catch((err) => handleError(err, res));
+  };
 }

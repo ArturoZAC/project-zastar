@@ -1,25 +1,20 @@
 import { Router } from "express";
-import { z } from "zod";
 
-import { createUserSchema, updateUserSchema } from "../../shared/schemas/user.schema";
+import { UserRepositoryImpl } from "../../infrastructure/repositories/user.repository";
 import { UserController } from "../controllers/user.controller";
-import { validateBody, validateParams } from "../middlewares/validation.middleware";
 
-const router: Router = Router();
+export class UserRoutes {
+  readonly router: Router;
 
-const idParamSchema = z.object({
-  id: z.string().uuid(),
-});
+  constructor() {
+    const repo = new UserRepositoryImpl();
+    const controller = new UserController(repo);
 
-router.post("/", validateBody(createUserSchema), UserController.create);
-router.get("/", UserController.getAll);
-router.get("/:id", validateParams(idParamSchema), UserController.getById);
-router.patch(
-  "/:id",
-  validateParams(idParamSchema),
-  validateBody(updateUserSchema),
-  UserController.update,
-);
-router.delete("/:id", validateParams(idParamSchema), UserController.delete);
-
-export default router;
+    this.router = Router();
+    this.router.post("/", controller.create);
+    this.router.get("/", controller.getAll);
+    this.router.get("/:id", controller.getById);
+    this.router.patch("/:id", controller.update);
+    this.router.delete("/:id", controller.delete);
+  }
+}

@@ -6,31 +6,32 @@ import { NotFoundError } from "../../../shared/errors/not-found-error";
 
 interface ConfirmPaymentInput {
   reservationId: string;
-  sourceId: string; // Token from frontend (tkn_xxx for Culqi, formToken for Izipay)
+  sourceId: string;
 }
 
-export class ConfirmPaymentUseCase {
+interface ConfirmPaymentResult {
+  reservationId: string;
+  ticketCode: string;
+  paymentStatus: string;
+  formToken?: string;
+}
+
+export interface ConfirmPaymentUseCase {
+  execute(input: ConfirmPaymentInput): Promise<ConfirmPaymentResult>;
+}
+
+export class ConfirmPayment implements ConfirmPaymentUseCase {
   constructor(
     private readonly reservationRepo: ReservationRepository,
     private readonly paymentRepo: PaymentRepository,
   ) {}
 
-  async execute(input: ConfirmPaymentInput) {
-    // 1. Find reservation
+  execute = async (input: ConfirmPaymentInput): Promise<ConfirmPaymentResult> => {
     const reservation = await this.reservationRepo.findById(input.reservationId);
-    if (!reservation) {
-      throw new NotFoundError("Reservation not found");
-    }
+    if (!reservation) throw new NotFoundError("Reservation not found");
+    if (reservation.status !== "pending") throw new BadRequestError("Reservation is not pending");
+    if (!reservation.guestEmail) throw new BadRequestError("Reservation has no guest email");
 
-    if (reservation.status !== "pending") {
-      throw new BadRequestError("Reservation is not pending");
-    }
-
-    if (!reservation.guestEmail) {
-      throw new BadRequestError("Reservation has no guest email");
-    }
-
-    // 2. Create payment record
     const payment = await this.paymentRepo.create({
       reservationId: reservation.id,
       provider: "culqi",
@@ -38,7 +39,6 @@ export class ConfirmPaymentUseCase {
       status: "pending",
     });
 
-    // 3. Process payment via gateway
     const gateway = getPaymentGateway();
 
     try {
@@ -49,17 +49,13 @@ export class ConfirmPaymentUseCase {
         sourceId: input.sourceId,
       });
 
-      // 4. Update payment status
       await this.paymentRepo.update(payment.id, {
         providerPaymentId: result.providerPaymentId,
         status: result.status === "completed" ? "completed" : "pending",
       });
 
-      // 5. Update reservation status if payment completed
       if (result.status === "completed") {
-        await this.reservationRepo.update(reservation.id, {
-          status: "confirmed",
-        });
+        await this.reservationRepo.update(reservation.id, { status: "confirmed" });
       }
 
       return {
@@ -69,12 +65,8 @@ export class ConfirmPaymentUseCase {
         formToken: result.formToken,
       };
     } catch (error) {
-      // Mark payment as failed
-      await this.paymentRepo.update(payment.id, {
-        status: "failed",
-      });
-
+      await this.paymentRepo.update(payment.id, { status: "failed" });
       throw error;
     }
-  }
+  };
 }

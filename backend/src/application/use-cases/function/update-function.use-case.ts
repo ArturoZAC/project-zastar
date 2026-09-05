@@ -1,17 +1,18 @@
+import { Function } from "../../../domain/entities/function.entity";
 import { FunctionRepository } from "../../../domain/repositories/function.repository";
 import { NotFoundError } from "../../../shared/errors/not-found-error";
 import { UpdateFunctionInput } from "../../../shared/schemas/function.schema";
 
-export class UpdateFunctionUseCase {
+export interface UpdateFunctionUseCase {
+  execute(id: string, data: UpdateFunctionInput): Promise<Function>;
+}
+
+export class UpdateFunction implements UpdateFunctionUseCase {
   constructor(private readonly functionRepo: FunctionRepository) {}
 
-  async execute(id: string, data: UpdateFunctionInput) {
+  execute = async (id: string, data: UpdateFunctionInput): Promise<Function> => {
     const existing = await this.functionRepo.findById(id);
-    if (!existing) {
-      throw new NotFoundError("Function not found");
-    }
-
-    const func = await this.functionRepo.update(id, data);
-    return func;
-  }
+    if (!existing) throw new NotFoundError("Function not found");
+    return this.functionRepo.update(id, data);
+  };
 }

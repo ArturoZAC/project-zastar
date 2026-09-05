@@ -1,15 +1,13 @@
 import { CreateUserInput, createUserSchema } from "../../../shared/schemas/user.schema";
 
-type Result = { success: true; dto: CreateUserDto } | { success: false; error: string };
-
 export class CreateUserDto {
   private constructor(public readonly data: CreateUserInput) {}
 
-  static create(object: unknown): Result {
+  static create(object: unknown): { error?: string; dto?: CreateUserDto } {
     const result = createUserSchema.safeParse(object);
-    if (result.error) {
-      return { success: false, error: result.error.issues[0].message };
+    if (!result.success) {
+      return { error: result.error.issues[0].message };
     }
-    return { success: true, dto: new CreateUserDto(result.data) };
+    return { dto: new CreateUserDto(result.data) };
   }
 }

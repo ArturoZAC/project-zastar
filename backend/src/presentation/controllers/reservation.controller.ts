@@ -1,66 +1,96 @@
 import { Request, Response } from "express";
 
-import { CancelReservationUseCase } from "../../application/use-cases/reservation/cancel-reservation.use-case";
-import { ConfirmPaymentUseCase } from "../../application/use-cases/reservation/confirm-payment.use-case";
-import { CreateReservationUseCase } from "../../application/use-cases/reservation/create-reservation.use-case";
-import { GetReservationUseCase } from "../../application/use-cases/reservation/get-reservation.use-case";
-import { FunctionRepositoryImpl } from "../../infrastructure/repositories/function.repository";
-import { PaymentRepositoryImpl } from "../../infrastructure/repositories/payment.repository";
-import { ReservationRepositoryImpl } from "../../infrastructure/repositories/reservation.repository";
-import { ReservationSeatRepositoryImpl } from "../../infrastructure/repositories/reservation-seat.repository";
-import { SeatRepositoryImpl } from "../../infrastructure/repositories/seat.repository";
+import { CancelReservation } from "../../application/use-cases/reservation/cancel-reservation.use-case";
+import { ConfirmPayment } from "../../application/use-cases/reservation/confirm-payment.use-case";
+import { CreateReservation } from "../../application/use-cases/reservation/create-reservation.use-case";
+import { GetReservation } from "../../application/use-cases/reservation/get-reservation.use-case";
+import { FunctionRepository } from "../../domain/repositories/function.repository";
+import { PaymentRepository } from "../../domain/repositories/payment.repository";
+import { ReservationRepository } from "../../domain/repositories/reservation.repository";
+import { ReservationSeatRepository } from "../../domain/repositories/reservation-seat.repository";
+import { SeatRepository } from "../../domain/repositories/seat.repository";
+import { handleError } from "../../shared/helpers/handle-error";
 import { ResponseHelper } from "../../shared/helpers/response";
-
-const reservationRepo = new ReservationRepositoryImpl();
-const reservationSeatRepo = new ReservationSeatRepositoryImpl();
-const functionRepo = new FunctionRepositoryImpl();
-const seatRepo = new SeatRepositoryImpl();
-const paymentRepo = new PaymentRepositoryImpl();
+import { CreateReservationDto } from "../dtos/reservation/create-reservation.dto";
 
 export class ReservationController {
-  static async create(req: Request, res: Response) {
-    const useCase = new CreateReservationUseCase(
-      reservationRepo,
-      reservationSeatRepo,
-      functionRepo,
-      seatRepo,
-      paymentRepo,
-    );
-    const reservation = await useCase.execute(req.body);
-    res.status(201).json(ResponseHelper.created("Reservation created", reservation));
-  }
+  constructor(
+    private readonly reservationRepo: ReservationRepository,
+    private readonly reservationSeatRepo: ReservationSeatRepository,
+    private readonly functionRepo: FunctionRepository,
+    private readonly seatRepo: SeatRepository,
+    private readonly paymentRepo: PaymentRepository,
+  ) {}
 
-  static async getAll(req: Request, res: Response) {
-    const useCase = new GetReservationUseCase(reservationRepo, reservationSeatRepo);
-    const reservations = await useCase.executeAll(req.query);
-    res.status(200).json(ResponseHelper.success("Reservations retrieved", reservations));
-  }
+  public create = (req: Request, res: Response) => {
+    const { error, dto } = CreateReservationDto.create(req.body);
+    if (error) return res.status(400).json({ success: false, message: error });
 
-  static async getById(req: Request, res: Response) {
-    const useCase = new GetReservationUseCase(reservationRepo, reservationSeatRepo);
-    const reservation = await useCase.execute(req.params.id as string);
-    res.status(200).json(ResponseHelper.success("Reservation retrieved", reservation));
-  }
+    new CreateReservation(
+      this.reservationRepo,
+      this.reservationSeatRepo,
+      this.functionRepo,
+      this.seatRepo,
+      this.paymentRepo,
+    )
+      .execute(dto!.data)
+      .then((reservation) =>
+        res.status(201).json(ResponseHelper.created("Reservation created", reservation)),
+      )
+      .catch((err) => handleError(err, res));
+  };
 
-  static async getByTicketCode(req: Request, res: Response) {
-    const useCase = new GetReservationUseCase(reservationRepo, reservationSeatRepo);
-    const ticketCode = req.params.ticketCode as string;
-    const reservation = await useCase.executeByTicketCode(ticketCode);
-    res.status(200).json(ResponseHelper.success("Reservation retrieved", reservation));
-  }
+  public getAll = (req: Request, res: Response) => {
+    new GetReservation(this.reservationRepo, this.reservationSeatRepo)
+      .executeAll(req.query as Record<string, string>)
+      .then((reservations) =>
+        res.status(200).json(ResponseHelper.success("Reservations retrieved", reservations)),
+      )
+      .catch((err) => handleError(err, res));
+  };
 
-  static async confirmPayment(req: Request, res: Response) {
-    const useCase = new ConfirmPaymentUseCase(reservationRepo, paymentRepo);
-    const result = await useCase.execute({
-      reservationId: req.params.id as string,
-      sourceId: req.body.sourceId,
-    });
-    res.status(200).json(ResponseHelper.success("Payment processed", result));
-  }
+  public getById = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
 
-  static async cancel(req: Request, res: Response) {
-    const useCase = new CancelReservationUseCase(reservationRepo, reservationSeatRepo);
-    await useCase.execute(req.params.id as string);
-    res.status(204).send();
-  }
+    new GetReservation(this.reservationRepo, this.reservationSeatRepo)
+      .execute(id)
+      .then((reservation) =>
+        res.status(200).json(ResponseHelper.success("Reservation retrieved", reservation)),
+      )
+      .catch((err) => handleError(err, res));
+  };
+
+  public getByTicketCode = (req: Request<{ ticketCode: string }>, res: Response) => {
+    const { ticketCode } = req.params;
+
+    new GetReservation(this.reservationRepo, this.reservationSeatRepo)
+      .executeByTicketCode(ticketCode)
+      .then((reservation) =>
+        res.status(200).json(ResponseHelper.success("Reservation retrieved", reservation)),
+      )
+      .catch((err) => handleError(err, res));
+  };
+
+  public confirmPayment = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    const { sourceId } = req.body;
+
+    if (!sourceId || typeof sourceId !== "string") {
+      return res.status(400).json({ success: false, message: "sourceId is required" });
+    }
+
+    new ConfirmPayment(this.reservationRepo, this.paymentRepo)
+      .execute({ reservationId: id, sourceId })
+      .then((result) => res.status(200).json(ResponseHelper.success("Payment processed", result)))
+      .catch((err) => handleError(err, res));
+  };
+
+  public cancel = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+
+    new CancelReservation(this.reservationRepo, this.reservationSeatRepo)
+      .execute(id)
+      .then(() => res.status(204).send())
+      .catch((err) => handleError(err, res));
+  };
 }

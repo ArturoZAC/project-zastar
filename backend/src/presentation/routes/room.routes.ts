@@ -1,29 +1,22 @@
 import { Router } from "express";
-import { z } from "zod";
 
-import {
-  createRoomSchema,
-  roomFiltersSchema,
-  updateRoomSchema,
-} from "../../shared/schemas/room.schema";
+import { RoomRepositoryImpl } from "../../infrastructure/repositories/room.repository";
+import { SeatRepositoryImpl } from "../../infrastructure/repositories/seat.repository";
 import { RoomController } from "../controllers/room.controller";
-import { validateBody, validateParams, validateQuery } from "../middlewares/validation.middleware";
 
-const router: Router = Router();
+export class RoomRoutes {
+  readonly router: Router;
 
-const idParamSchema = z.object({
-  id: z.string().uuid(),
-});
+  constructor() {
+    const roomRepo = new RoomRepositoryImpl();
+    const seatRepo = new SeatRepositoryImpl();
+    const controller = new RoomController(roomRepo, seatRepo);
 
-router.post("/", validateBody(createRoomSchema), RoomController.create);
-router.get("/", validateQuery(roomFiltersSchema), RoomController.getAll);
-router.get("/:id", validateParams(idParamSchema), RoomController.getById);
-router.patch(
-  "/:id",
-  validateParams(idParamSchema),
-  validateBody(updateRoomSchema),
-  RoomController.update,
-);
-router.delete("/:id", validateParams(idParamSchema), RoomController.delete);
-
-export default router;
+    this.router = Router();
+    this.router.post("/", controller.create);
+    this.router.get("/", controller.getAll);
+    this.router.get("/:id", controller.getById);
+    this.router.patch("/:id", controller.update);
+    this.router.delete("/:id", controller.delete);
+  }
+}

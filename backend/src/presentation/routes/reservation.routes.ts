@@ -1,41 +1,35 @@
 import { Router } from "express";
-import { z } from "zod";
 
-import {
-  createReservationSchema,
-  reservationFiltersSchema,
-} from "../../shared/schemas/reservation.schema";
+import { FunctionRepositoryImpl } from "../../infrastructure/repositories/function.repository";
+import { PaymentRepositoryImpl } from "../../infrastructure/repositories/payment.repository";
+import { ReservationRepositoryImpl } from "../../infrastructure/repositories/reservation.repository";
+import { ReservationSeatRepositoryImpl } from "../../infrastructure/repositories/reservation-seat.repository";
+import { SeatRepositoryImpl } from "../../infrastructure/repositories/seat.repository";
 import { ReservationController } from "../controllers/reservation.controller";
-import { validateBody, validateParams, validateQuery } from "../middlewares/validation.middleware";
 
-const router: Router = Router();
+export class ReservationRoutes {
+  readonly router: Router;
 
-const idParamSchema = z.object({
-  id: z.string().uuid(),
-});
+  constructor() {
+    const reservationRepo = new ReservationRepositoryImpl();
+    const reservationSeatRepo = new ReservationSeatRepositoryImpl();
+    const functionRepo = new FunctionRepositoryImpl();
+    const seatRepo = new SeatRepositoryImpl();
+    const paymentRepo = new PaymentRepositoryImpl();
+    const controller = new ReservationController(
+      reservationRepo,
+      reservationSeatRepo,
+      functionRepo,
+      seatRepo,
+      paymentRepo,
+    );
 
-const ticketCodeParamSchema = z.object({
-  ticketCode: z.string().min(1),
-});
-
-const confirmPaymentSchema = z.object({
-  sourceId: z.string().min(1),
-});
-
-router.post("/", validateBody(createReservationSchema), ReservationController.create);
-router.get("/", validateQuery(reservationFiltersSchema), ReservationController.getAll);
-router.get(
-  "/ticket/:ticketCode",
-  validateParams(ticketCodeParamSchema),
-  ReservationController.getByTicketCode,
-);
-router.get("/:id", validateParams(idParamSchema), ReservationController.getById);
-router.post(
-  "/:id/pay",
-  validateParams(idParamSchema),
-  validateBody(confirmPaymentSchema),
-  ReservationController.confirmPayment,
-);
-router.post("/:id/cancel", validateParams(idParamSchema), ReservationController.cancel);
-
-export default router;
+    this.router = Router();
+    this.router.post("/", controller.create);
+    this.router.get("/", controller.getAll);
+    this.router.get("/ticket/:ticketCode", controller.getByTicketCode);
+    this.router.get("/:id", controller.getById);
+    this.router.post("/:id/pay", controller.confirmPayment);
+    this.router.post("/:id/cancel", controller.cancel);
+  }
+}

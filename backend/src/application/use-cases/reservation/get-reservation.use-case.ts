@@ -1,44 +1,40 @@
+import { Reservation } from "../../../domain/entities/reservation.entity";
+import { ReservationSeat } from "../../../domain/entities/reservation-seat.entity";
 import { ReservationRepository } from "../../../domain/repositories/reservation.repository";
 import { ReservationSeatRepository } from "../../../domain/repositories/reservation-seat.repository";
 import { NotFoundError } from "../../../shared/errors/not-found-error";
-import { ReservationFilters } from "../../../shared/schemas/reservation.schema";
 
-export class GetReservationUseCase {
+interface ReservationWithSeats extends Reservation {
+  seats: ReservationSeat[];
+}
+
+export interface GetReservationUseCase {
+  execute(id: string): Promise<ReservationWithSeats>;
+  executeByTicketCode(ticketCode: string): Promise<ReservationWithSeats>;
+  executeAll(filters?: Record<string, string>): Promise<Reservation[]>;
+}
+
+export class GetReservation implements GetReservationUseCase {
   constructor(
     private readonly reservationRepo: ReservationRepository,
     private readonly reservationSeatRepo: ReservationSeatRepository,
   ) {}
 
-  async execute(id: string) {
+  execute = async (id: string): Promise<ReservationWithSeats> => {
     const reservation = await this.reservationRepo.findById(id);
-    if (!reservation) {
-      throw new NotFoundError("Reservation not found");
-    }
-
+    if (!reservation) throw new NotFoundError("Reservation not found");
     const seats = await this.reservationSeatRepo.findByReservationId(id);
+    return { ...reservation, seats };
+  };
 
-    return {
-      ...reservation,
-      seats,
-    };
-  }
-
-  async executeByTicketCode(ticketCode: string) {
+  executeByTicketCode = async (ticketCode: string): Promise<ReservationWithSeats> => {
     const reservation = await this.reservationRepo.findByTicketCode(ticketCode);
-    if (!reservation) {
-      throw new NotFoundError("Reservation not found");
-    }
-
+    if (!reservation) throw new NotFoundError("Reservation not found");
     const seats = await this.reservationSeatRepo.findByReservationId(reservation.id);
+    return { ...reservation, seats };
+  };
 
-    return {
-      ...reservation,
-      seats,
-    };
-  }
-
-  async executeAll(filters?: ReservationFilters) {
-    const reservations = await this.reservationRepo.findAll(filters);
-    return reservations;
-  }
+  executeAll = async (filters?: Record<string, string>): Promise<Reservation[]> => {
+    return this.reservationRepo.findAll(filters);
+  };
 }

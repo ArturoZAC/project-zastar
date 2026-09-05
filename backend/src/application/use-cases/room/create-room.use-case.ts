@@ -1,26 +1,28 @@
+import { Room } from "../../../domain/entities/room.entity";
 import { RoomRepository } from "../../../domain/repositories/room.repository";
 import { SeatRepository } from "../../../domain/repositories/seat.repository";
 import { ConflictError } from "../../../shared/errors/conflict-error";
 import { CreateRoomInput } from "../../../shared/schemas/room.schema";
 import { CreateSeatInput } from "../../../shared/schemas/seat.schema";
 
-export class CreateRoomUseCase {
+export interface CreateRoomUseCase {
+  execute(data: CreateRoomInput): Promise<Room>;
+}
+
+export class CreateRoom implements CreateRoomUseCase {
   constructor(
     private readonly roomRepo: RoomRepository,
     private readonly seatRepo: SeatRepository,
   ) {}
 
-  async execute(data: CreateRoomInput) {
+  execute = async (data: CreateRoomInput): Promise<Room> => {
     const existing = await this.roomRepo.findByName(data.name);
-    if (existing) {
-      throw new ConflictError("Room name already exists");
-    }
+    if (existing) throw new ConflictError("Room name already exists");
 
     const room = await this.roomRepo.create(data);
 
-    // Auto-generate seats based on totalSeats
     const seatData: CreateSeatInput[] = [];
-    const rows = Math.ceil(data.totalSeats / 10); // 10 seats per row
+    const rows = Math.ceil(data.totalSeats / 10);
 
     for (let i = 0; i < rows; i++) {
       const seatsInRow = Math.min(10, data.totalSeats - i * 10);
@@ -29,9 +31,9 @@ export class CreateRoomUseCase {
         const seatNum = j + 1;
         seatData.push({
           roomId: room.id,
-          row: String.fromCharCode(64 + rowNum), // A, B, C...
+          row: String.fromCharCode(64 + rowNum),
           number: seatNum,
-          tier: rowNum <= 3 ? "vip" : "standard", // First 3 rows are VIP
+          tier: rowNum <= 3 ? "vip" : "standard",
         });
       }
     }
@@ -41,5 +43,5 @@ export class CreateRoomUseCase {
     }
 
     return room;
-  }
+  };
 }

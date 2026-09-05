@@ -1,15 +1,13 @@
 import { CreateSeatInput, createSeatSchema } from "../../../shared/schemas/seat.schema";
 
-type Result = { success: true; dto: CreateSeatDto } | { success: false; error: string };
-
 export class CreateSeatDto {
   private constructor(public readonly data: CreateSeatInput) {}
 
-  static create(object: unknown): Result {
+  static create(object: unknown): { error?: string; dto?: CreateSeatDto } {
     const result = createSeatSchema.safeParse(object);
-    if (result.error) {
-      return { success: false, error: result.error.issues[0].message };
+    if (!result.success) {
+      return { error: result.error.issues[0].message };
     }
-    return { success: true, dto: new CreateSeatDto(result.data) };
+    return { dto: new CreateSeatDto(result.data) };
   }
 }

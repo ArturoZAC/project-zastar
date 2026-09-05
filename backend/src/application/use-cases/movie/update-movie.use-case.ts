@@ -1,17 +1,18 @@
+import { Movie } from "../../../domain/entities/movie.entity";
 import { MovieRepository } from "../../../domain/repositories/movie.repository";
 import { NotFoundError } from "../../../shared/errors/not-found-error";
 import { UpdateMovieInput } from "../../../shared/schemas/movie.schema";
 
-export class UpdateMovieUseCase {
+export interface UpdateMovieUseCase {
+  execute(id: string, data: UpdateMovieInput): Promise<Movie>;
+}
+
+export class UpdateMovie implements UpdateMovieUseCase {
   constructor(private readonly movieRepo: MovieRepository) {}
 
-  async execute(id: string, data: UpdateMovieInput) {
+  execute = async (id: string, data: UpdateMovieInput): Promise<Movie> => {
     const existing = await this.movieRepo.findById(id);
-    if (!existing) {
-      throw new NotFoundError("Movie not found");
-    }
-
-    const movie = await this.movieRepo.update(id, data);
-    return movie;
-  }
+    if (!existing) throw new NotFoundError("Movie not found");
+    return this.movieRepo.update(id, data);
+  };
 }

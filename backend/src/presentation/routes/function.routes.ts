@@ -1,29 +1,26 @@
 import { Router } from "express";
-import { z } from "zod";
 
-import {
-  createFunctionSchema,
-  functionFiltersSchema,
-  updateFunctionSchema,
-} from "../../shared/schemas/function.schema";
+import { FunctionRepositoryImpl } from "../../infrastructure/repositories/function.repository";
+import { MovieRepositoryImpl } from "../../infrastructure/repositories/movie.repository";
+import { RoomRepositoryImpl } from "../../infrastructure/repositories/room.repository";
+import { SeatRepositoryImpl } from "../../infrastructure/repositories/seat.repository";
 import { FunctionController } from "../controllers/function.controller";
-import { validateBody, validateParams, validateQuery } from "../middlewares/validation.middleware";
 
-const router: Router = Router();
+export class FunctionRoutes {
+  readonly router: Router;
 
-const idParamSchema = z.object({
-  id: z.string().uuid(),
-});
+  constructor() {
+    const functionRepo = new FunctionRepositoryImpl();
+    const roomRepo = new RoomRepositoryImpl();
+    const movieRepo = new MovieRepositoryImpl();
+    const seatRepo = new SeatRepositoryImpl();
+    const controller = new FunctionController(functionRepo, roomRepo, movieRepo, seatRepo);
 
-router.post("/", validateBody(createFunctionSchema), FunctionController.create);
-router.get("/", validateQuery(functionFiltersSchema), FunctionController.getAll);
-router.get("/:id", validateParams(idParamSchema), FunctionController.getById);
-router.patch(
-  "/:id",
-  validateParams(idParamSchema),
-  validateBody(updateFunctionSchema),
-  FunctionController.update,
-);
-router.delete("/:id", validateParams(idParamSchema), FunctionController.delete);
-
-export default router;
+    this.router = Router();
+    this.router.post("/", controller.create);
+    this.router.get("/", controller.getAll);
+    this.router.get("/:id", controller.getById);
+    this.router.patch("/:id", controller.update);
+    this.router.delete("/:id", controller.delete);
+  }
+}

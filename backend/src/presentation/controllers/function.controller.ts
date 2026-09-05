@@ -1,51 +1,74 @@
 import { Request, Response } from "express";
 
-import { CreateFunctionUseCase } from "../../application/use-cases/function/create-function.use-case";
-import { DeleteFunctionUseCase } from "../../application/use-cases/function/delete-function.use-case";
+import { CreateFunction } from "../../application/use-cases/function/create-function.use-case";
+import { DeleteFunction } from "../../application/use-cases/function/delete-function.use-case";
 import {
-  GetAllFunctionsUseCase,
-  GetFunctionByIdUseCase,
+  GetAllFunctions,
+  GetFunctionById,
 } from "../../application/use-cases/function/get-functions.use-case";
-import { UpdateFunctionUseCase } from "../../application/use-cases/function/update-function.use-case";
-import { FunctionRepositoryImpl } from "../../infrastructure/repositories/function.repository";
-import { MovieRepositoryImpl } from "../../infrastructure/repositories/movie.repository";
-import { RoomRepositoryImpl } from "../../infrastructure/repositories/room.repository";
-import { SeatRepositoryImpl } from "../../infrastructure/repositories/seat.repository";
+import { UpdateFunction } from "../../application/use-cases/function/update-function.use-case";
+import { FunctionRepository } from "../../domain/repositories/function.repository";
+import { MovieRepository } from "../../domain/repositories/movie.repository";
+import { RoomRepository } from "../../domain/repositories/room.repository";
+import { SeatRepository } from "../../domain/repositories/seat.repository";
+import { handleError } from "../../shared/helpers/handle-error";
 import { ResponseHelper } from "../../shared/helpers/response";
-
-const functionRepo = new FunctionRepositoryImpl();
-const roomRepo = new RoomRepositoryImpl();
-const movieRepo = new MovieRepositoryImpl();
-const seatRepo = new SeatRepositoryImpl();
+import { CreateFunctionDto } from "../dtos/function/create-function.dto";
+import { UpdateFunctionDto } from "../dtos/function/update-function.dto";
 
 export class FunctionController {
-  static async create(req: Request, res: Response) {
-    const useCase = new CreateFunctionUseCase(functionRepo, roomRepo, movieRepo, seatRepo);
-    const func = await useCase.execute(req.body);
-    res.status(201).json(ResponseHelper.created("Function created", func));
-  }
+  constructor(
+    private readonly functionRepo: FunctionRepository,
+    private readonly roomRepo: RoomRepository,
+    private readonly movieRepo: MovieRepository,
+    private readonly seatRepo: SeatRepository,
+  ) {}
 
-  static async getAll(req: Request, res: Response) {
-    const useCase = new GetAllFunctionsUseCase(functionRepo);
-    const functions = await useCase.execute(req.query);
-    res.status(200).json(ResponseHelper.success("Functions retrieved", functions));
-  }
+  public create = (req: Request, res: Response) => {
+    const { error, dto } = CreateFunctionDto.create(req.body);
+    if (error) return res.status(400).json({ success: false, message: error });
 
-  static async getById(req: Request, res: Response) {
-    const useCase = new GetFunctionByIdUseCase(functionRepo);
-    const func = await useCase.execute(req.params.id as string);
-    res.status(200).json(ResponseHelper.success("Function retrieved", func));
-  }
+    new CreateFunction(this.functionRepo, this.roomRepo, this.movieRepo, this.seatRepo)
+      .execute(dto!.data)
+      .then((func) => res.status(201).json(ResponseHelper.created("Function created", func)))
+      .catch((err) => handleError(err, res));
+  };
 
-  static async update(req: Request, res: Response) {
-    const useCase = new UpdateFunctionUseCase(functionRepo);
-    const func = await useCase.execute(req.params.id as string, req.body);
-    res.status(200).json(ResponseHelper.success("Function updated", func));
-  }
+  public getAll = (req: Request, res: Response) => {
+    new GetAllFunctions(this.functionRepo)
+      .execute(req.query as Record<string, string>)
+      .then((functions) =>
+        res.status(200).json(ResponseHelper.success("Functions retrieved", functions)),
+      )
+      .catch((err) => handleError(err, res));
+  };
 
-  static async delete(req: Request, res: Response) {
-    const useCase = new DeleteFunctionUseCase(functionRepo);
-    await useCase.execute(req.params.id as string);
-    res.status(204).send();
-  }
+  public getById = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+
+    new GetFunctionById(this.functionRepo)
+      .execute(id)
+      .then((func) => res.status(200).json(ResponseHelper.success("Function retrieved", func)))
+      .catch((err) => handleError(err, res));
+  };
+
+  public update = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    const { error, dto } = UpdateFunctionDto.create(req.body);
+    if (error) return res.status(400).json({ success: false, message: error });
+
+    new UpdateFunction(this.functionRepo)
+      .execute(id, dto!.data)
+      .then((func) => res.status(200).json(ResponseHelper.success("Function updated", func)))
+      .catch((err) => handleError(err, res));
+  };
+
+  public delete = (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+
+    new DeleteFunction(this.functionRepo)
+      .execute(id)
+      .then(() => res.status(204).send())
+      .catch((err) => handleError(err, res));
+  };
 }

@@ -1,17 +1,18 @@
+import { Genre } from "../../../domain/entities/genre.entity";
 import { GenreRepository } from "../../../domain/repositories/genre.repository";
 import { NotFoundError } from "../../../shared/errors/not-found-error";
 import { UpdateGenreInput } from "../../../shared/schemas/genre.schema";
 
-export class UpdateGenreUseCase {
+export interface UpdateGenreUseCase {
+  execute(id: string, data: UpdateGenreInput): Promise<Genre>;
+}
+
+export class UpdateGenre implements UpdateGenreUseCase {
   constructor(private readonly genreRepo: GenreRepository) {}
 
-  async execute(id: string, data: UpdateGenreInput) {
+  execute = async (id: string, data: UpdateGenreInput): Promise<Genre> => {
     const existing = await this.genreRepo.findById(id);
-    if (!existing) {
-      throw new NotFoundError("Genre not found");
-    }
-
-    const genre = await this.genreRepo.update(id, data);
-    return genre;
-  }
+    if (!existing) throw new NotFoundError("Genre not found");
+    return this.genreRepo.update(id, data);
+  };
 }
