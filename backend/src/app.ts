@@ -1,12 +1,12 @@
+import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import express from "express";
-import { toNodeHandler } from "better-auth/node";
 
-import { auth } from "./shared/config/auth";
-import { envs } from "./shared/config/envs";
 import { errorHandler } from "./presentation/middlewares/error-handler.middleware";
 import { apiLimiter, authLimiter } from "./presentation/middlewares/rate-limit.middleware";
 import routes from "./presentation/routes";
+import { auth } from "./shared/config/auth";
+import { envs } from "./shared/config/envs";
 
 const app: ReturnType<typeof express> = express();
 
