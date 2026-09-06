@@ -13,7 +13,6 @@ export class UserRoutes {
     const controller = new UserController(repo);
 
     this.router = Router();
-    this.router.post("/", requireAuth, requireAdmin, controller.create);
     this.router.get("/", requireAuth, requireAdmin, controller.getAll);
     this.router.get("/:id", requireAuth, requireAdmin, controller.getById);
     this.router.patch("/:id", requireAuth, requireAdmin, controller.update);

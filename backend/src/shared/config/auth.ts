@@ -2,22 +2,21 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 import { db } from "../../infrastructure/database/connection";
-import {
-  authAccount,
-  authSession,
-  authUser,
-  authVerification,
-} from "../../infrastructure/database/schema/auth.schema";
+import { accounts } from "../../infrastructure/database/schema/account.schema";
+import { sessions } from "../../infrastructure/database/schema/session.schema";
+import { users } from "../../infrastructure/database/schema/user.schema";
+import { verifications } from "../../infrastructure/database/schema/verification.schema";
 import { envs } from "./envs";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
+    usePlural: true,
     schema: {
-      user: authUser,
-      session: authSession,
-      account: authAccount,
-      verification: authVerification,
+      user: users,
+      session: sessions,
+      account: accounts,
+      verification: verifications,
     },
   }),
   baseURL: envs.BETTER_AUTH_URL,

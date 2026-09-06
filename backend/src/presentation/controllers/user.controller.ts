@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 
-import { CreateUser } from "../../application/use-cases/user/create-user.use-case";
 import { DeleteUser } from "../../application/use-cases/user/delete-user.use-case";
 import { GetAllUsers } from "../../application/use-cases/user/get-all-users.use-case";
 import { GetUser } from "../../application/use-cases/user/get-user.use-case";
@@ -8,21 +7,10 @@ import { UpdateUser } from "../../application/use-cases/user/update-user.use-cas
 import { UserRepository } from "../../domain/repositories/user.repository";
 import { handleError } from "../../shared/helpers/handle-error";
 import { ResponseHelper } from "../../shared/helpers/response";
-import { CreateUserDto } from "../dtos/user/create-user.dto";
 import { UpdateUserDto } from "../dtos/user/update-user.dto";
 
 export class UserController {
   constructor(private readonly userRepo: UserRepository) {}
-
-  public create = (req: Request, res: Response) => {
-    const { error, dto } = CreateUserDto.create(req.body);
-    if (error) return res.status(400).json({ success: false, message: error });
-
-    new CreateUser(this.userRepo)
-      .execute(dto!.data)
-      .then((user) => res.status(201).json(ResponseHelper.created("User created", user)))
-      .catch((err) => handleError(err, res));
-  };
 
   public getAll = (req: Request, res: Response) => {
     new GetAllUsers(this.userRepo)

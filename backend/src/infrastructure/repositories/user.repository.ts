@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
 import { UserRepository } from "../../domain/repositories/user.repository";
-import { CreateUserInput, UpdateUserInput } from "../../shared/schemas/user.schema";
+import { UpdateUserInput } from "../../shared/schemas/user.schema";
 import { db } from "../database/connection";
 import { users } from "../database/schema/user.schema";
 import { toUserEntity } from "../mappers/user.mapper";
@@ -22,11 +22,6 @@ export class UserRepositoryImpl extends UserRepository {
     return rows.map(toUserEntity);
   }
 
-  async create(data: CreateUserInput) {
-    const [row] = await db.insert(users).values(data).returning();
-    return toUserEntity(row);
-  }
-
   async update(id: string, data: UpdateUserInput) {
     const [row] = await db
       .update(users)
@@ -37,6 +32,6 @@ export class UserRepositoryImpl extends UserRepository {
   }
 
   async softDelete(id: string) {
-    await db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, id));
+    await db.update(users).set({ isActive: false, updatedAt: new Date() }).where(eq(users.id, id));
   }
 }

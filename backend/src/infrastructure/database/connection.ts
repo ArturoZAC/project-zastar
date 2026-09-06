@@ -5,12 +5,7 @@ import { envs } from "../../shared/config/envs";
 import { logger } from "../../shared/config/logger";
 import { functions } from "./schema/function.schema";
 import { genres } from "./schema/genre.schema";
-import {
-  authAccount,
-  authSession,
-  authUser,
-  authVerification,
-} from "./schema/auth.schema";
+import { accounts } from "./schema/account.schema";
 import { ageRatingTypeEnum, languageTypeEnum, movies } from "./schema/movie.schema";
 import { movieGenres } from "./schema/movie-genre.schema";
 import { paymentProviderEnum, payments, paymentStatusEnum } from "./schema/payment.schema";
@@ -18,15 +13,15 @@ import { reservations, reservationStatusEnum } from "./schema/reservation.schema
 import { reservationSeats } from "./schema/reservation-seat.schema";
 import { roomFormatEnum, rooms } from "./schema/room.schema";
 import { seats, seatTierEnum } from "./schema/seat.schema";
-import { userRoleEnum, users } from "./schema/user.schema";
+import { sessions } from "./schema/session.schema";
+import { users } from "./schema/user.schema";
+import { verifications } from "./schema/verification.schema";
 
 const schema = {
-  user: authUser,
-  session: authSession,
-  account: authAccount,
-  verification: authVerification,
   users,
-  userRoleEnum,
+  sessions,
+  accounts,
+  verifications,
   genres,
   movies,
   ageRatingTypeEnum,
