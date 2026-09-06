@@ -5,6 +5,7 @@ import { logger } from "./shared/config/logger";
 
 const server = app.listen(envs.PORT, () => {
   logger.info(`🚀 ZASTAR API running on http://localhost:${envs.PORT}`);
+  // console.log(`🚀 ZASTAR API running on http://localhost:${envs.PORT}`);
   logger.info(`📋 Environment: ${envs.NODE_ENV}`);
 });
 

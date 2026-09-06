@@ -1,4 +1,5 @@
 import pino from "pino";
+import pretty from "pino-pretty";
 
 import { envs } from "./envs";
 
@@ -14,13 +15,11 @@ const streams = isDev
   ? [
       {
         level: "debug",
-        stream: pino.transport({
-          target: "pino-pretty",
-          options: {
-            colorize: true,
-            translateTime: "HH:MM:ss",
-            ignore: "pid,hostname",
-          },
+        stream: pretty({
+          colorize: true,
+          translateTime: "HH:MM:ss",
+          ignore: "pid,hostname",
+          destination: process.stdout,
         }),
       },
       ...fileStreams,
