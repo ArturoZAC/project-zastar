@@ -1,6 +1,6 @@
-import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import express from "express";
+import { toNodeHandler } from "better-auth/node";
 
 import { errorHandler } from "./presentation/middlewares/error-handler.middleware";
 import { apiLimiter, authLimiter } from "./presentation/middlewares/rate-limit.middleware";
@@ -10,14 +10,7 @@ import { envs } from "./shared/config/envs";
 
 const app: ReturnType<typeof express> = express();
 
-// Better Auth handler (MUST be before express.json())
-app.all("/api/auth/{*any}", authLimiter, toNodeHandler(auth));
-
-// Body parsing (AFTER Better Auth handler)
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// CORS
+// CORS (MUST be before everything)
 app.use(
   cors({
     origin: envs.FRONTEND_URL,
@@ -25,6 +18,13 @@ app.use(
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   }),
 );
+
+// Better Auth handler (MUST be before express.json())
+app.all("/api/auth/*splat", authLimiter, toNodeHandler(auth));
+
+// Body parsing (AFTER Better Auth handler)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting for all API routes
 app.use("/api/v1", apiLimiter);

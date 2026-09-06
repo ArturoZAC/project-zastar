@@ -29,7 +29,7 @@ export const movies = pgTable(
     title: varchar("title", { length: 255 }).notNull(),
     synopsis: text("synopsis"),
     durationMinutes: integer("duration_minutes").notNull(),
-    posterUrl: varchar("poster_url", { length: 500 }),
+    posterKey: varchar("poster_key", { length: 500 }),
     trailerUrl: varchar("trailer_url", { length: 500 }),
     ageRating: ageRatingTypeEnum("age_rating").notNull(),
     language: languageTypeEnum("language").notNull().default("original"),

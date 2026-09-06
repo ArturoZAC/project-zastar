@@ -5,6 +5,12 @@ import { envs } from "../../shared/config/envs";
 import { logger } from "../../shared/config/logger";
 import { functions } from "./schema/function.schema";
 import { genres } from "./schema/genre.schema";
+import {
+  authAccount,
+  authSession,
+  authUser,
+  authVerification,
+} from "./schema/auth.schema";
 import { ageRatingTypeEnum, languageTypeEnum, movies } from "./schema/movie.schema";
 import { movieGenres } from "./schema/movie-genre.schema";
 import { paymentProviderEnum, payments, paymentStatusEnum } from "./schema/payment.schema";
@@ -15,6 +21,10 @@ import { seats, seatTierEnum } from "./schema/seat.schema";
 import { userRoleEnum, users } from "./schema/user.schema";
 
 const schema = {
+  user: authUser,
+  session: authSession,
+  account: authAccount,
+  verification: authVerification,
   users,
   userRoleEnum,
   genres,

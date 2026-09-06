@@ -2,11 +2,23 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 import { db } from "../../infrastructure/database/connection";
+import {
+  authAccount,
+  authSession,
+  authUser,
+  authVerification,
+} from "../../infrastructure/database/schema/auth.schema";
 import { envs } from "./envs";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
+    schema: {
+      user: authUser,
+      session: authSession,
+      account: authAccount,
+      verification: authVerification,
+    },
   }),
   baseURL: envs.BETTER_AUTH_URL,
   basePath: "/api/auth",

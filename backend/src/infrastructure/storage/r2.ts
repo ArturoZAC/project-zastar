@@ -6,18 +6,29 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || "";
-const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || "";
-const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || "";
-const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || "";
-const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL || "";
+import { envs } from "../../shared/config/envs";
+
+const getContentType = (key: string, contentType: string): string => {
+  if (contentType !== "application/octet-stream") return contentType;
+
+  const extension = key.split(".").pop()?.toLowerCase();
+  const contentTypes: Record<string, string> = {
+    gif: "image/gif",
+    jpeg: "image/jpeg",
+    jpg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+  };
+
+  return contentTypes[extension ?? ""] ?? contentType;
+};
 
 const s3Client = new S3Client({
   region: "auto",
-  endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  endpoint: `https://${envs.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
   credentials: {
-    accessKeyId: R2_ACCESS_KEY_ID,
-    secretAccessKey: R2_SECRET_ACCESS_KEY,
+    accessKeyId: envs.R2_ACCESS_KEY_ID,
+    secretAccessKey: envs.R2_SECRET_ACCESS_KEY,
   },
 });
 
@@ -33,23 +44,23 @@ export const R2Storage = {
     contentType: string,
   ): Promise<UploadResult> {
     const command = new PutObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: envs.R2_BUCKET_NAME,
       Key: key,
       Body: file,
-      ContentType: contentType,
+      ContentType: getContentType(key, contentType),
     });
 
     await s3Client.send(command);
 
     return {
       key,
-      url: `${R2_PUBLIC_URL}/${key}`,
+      url: `${envs.R2_PUBLIC_URL}/${key}`,
     };
   },
 
   async deleteFile(key: string): Promise<void> {
     const command = new DeleteObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: envs.R2_BUCKET_NAME,
       Key: key,
     });
 
@@ -58,7 +69,7 @@ export const R2Storage = {
 
   async getSignedUrl(key: string, expiresIn = 3600): Promise<string> {
     const command = new GetObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: envs.R2_BUCKET_NAME,
       Key: key,
     });
 
